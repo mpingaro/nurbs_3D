@@ -1,5 +1,4 @@
-function K = stiff_mat_grd_sig_grd(p,U,q,V,r,W,CP,sig,ngauss)
-
+function [rhs,S] = rhs_grd_sigma_tl(p,U,q,V,r,W,CP,S,d,E,nue,ngauss)
 % Read input
  % Control Points CP
 mu = length(U);
@@ -27,10 +26,10 @@ for cpk = 1:nw
   end
 end
 
-% initialize global stiffness matrix
-K  = zeros(ndof,ndof);
+% initialize global vector
+rhs  = zeros(ndof,1);
 
-nel = 0;
+nel = 0; 
 % loops over elements
 for k = (r+1):(mw-r-1)
   for j = (q+1):(mv-q-1)
@@ -39,13 +38,13 @@ for k = (r+1):(mw-r-1)
       if (U(i+1)~=U(i) && V(j+1)~=V(j) && W(k+1)~=W(k))
         ndof_e = 3*(p+1)*(q+1)*(r+1);
         map = (U(i+1)-U(i))*(V(j+1)-V(j))*(W(k+1)-W(k))/8;
-        ke = zeros(ndof_e,ndof_e);
+        rhs_e = zeros(ndof_e,1);
 
+        npt = 0;
         % Element stiffness matrix, loop over Gauss points
         [GPu,GWu] = gauss(ngauss(1));
         [GPv,GWv] = gauss(ngauss(2));
         [GPw,GWw] = gauss(ngauss(3));
-        npt = 0;
         for kw = 1:ngauss(3)
           for kv = 1:ngauss(2)
             for ku = 1:ngauss(1)
@@ -57,21 +56,20 @@ for k = (r+1):(mw-r-1)
               gwv = GWv(kv);
               gww = GWw(kw);
               J = detJ(i,p,u,U,j,q,v,V,k,r,w,W,CP);
-              BNL = B_NL_matrix(i,p,u,U,j,q,v,V,k,r,w,W,CP);
-              sig_t = [sig(1,npt+1,nel+1), sig(4,npt+1,nel+1), sig(6,npt+1,nel+1);...
-                    sig(4,npt+1,nel+1), sig(2,npt+1,nel+1), sig(5,npt+1,nel+1);...
-                    sig(6,npt+1,nel+1), sig(5,npt+1,nel+1), sig(3,npt+1,nel+1)];
-              sig_t = blkdiag(sig_t,sig_t,sig_t);
-              ke = BNL'*sig_t*BNL*gwu*gwv*gww*J*map + ke;
-              npt = npt + 1;
-        
+              % Compute B matrix
+              B = B_matrix_tl(i,p,u,U,j,q,v,V,k,r,w,W,CP,d);
+              % Compute Cauchy stress
+              S(:,npt+1,nel+1) = get_stress_tl(p,q,r,u,v,w,U,V,W,CP,d,E,nue);
+              rhs_e = B'*S(:,npt+1,nel+1)*gwu*gwv*gww*J*map + rhs_e;
               
+              npt = npt+1;
+
             end
           end
         end
-        nel = nel + 1;
-        
-        % Insert ke into global stiffness matrix K
+        nel = nel +1;
+       
+        % Insert rhs_e into global vector rhs
          % relation global-local dof
         dof_l = zeros(1,ndof_e);
         l=1;
@@ -85,12 +83,10 @@ for k = (r+1):(mw-r-1)
             end
           end
         end
-         % insert ke into K
-        for col = 1:3*(1+p)*(1+q)*(1+r)
-          for row = 1:3*(1+p)*(1+q)*(1+r)
-            K(dof_l(row),dof_l(col)) = ke(row,col) + K(dof_l(row),dof_l(col));
-          end
-        end
+         % insert rhs_e into rhs
+         for row = 1:3*(1+p)*(1+q)*(1+r)
+             rhs(dof_l(row),1) = rhs_e(row,1) + rhs(dof_l(row),1);
+         end
       end
     end
   end

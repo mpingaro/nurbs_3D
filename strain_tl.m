@@ -1,4 +1,4 @@
-function epsilon = strain_ul(p,q,r,i,j,k,u,v,w,U,V,W,CP,d)
+function epsilon = strain_tl(p,q,r,i,j,k,u,v,w,U,V,W,CP,d)
 % Calculates B-Matrix as in stiff_mat_el. Then strain = B*d
 % Input: p,q,r:     polynomial degrees
 %        U,V,W:     knot vectors
@@ -99,31 +99,3 @@ end
 epsilon = B*d;
 
 return
-
-% % Almansi strain tensor
-% B = zeros(6,3*ne);
-% for i = 1:ne
-%   B(1,3*(i-1)+1)= dRd(i,1)-0.5*dRd(i,1)^2;
-%   B(1,3*(i-1)+2)= -0.5*dRd(i,1)^2;
-%   B(1,3*(i-1)+3)= -0.5*dRd(i,1)^2;
-% 
-%   B(2,3*(i-1)+1)= -0.5*dRd(i,2)^2;
-%   B(2,3*(i-1)+2)= dRd(i,2)-0.5*dRd(i,2)^2;
-%   B(2,3*(i-1)+3)= -0.5*dRd(i,2)^2;
-%   
-%   B(3,3*(i-1)+1)= -0.5*dRd(i,3)^2;
-%   B(3,3*(i-1)+2)= -0.5*dRd(i,3)^2;
-%   B(3,3*(i-1)+3)= dRd(i,3)-0.5*dRd(i,3)^2;
-%   
-%   B(4,3*(i-1)+1)= dRd(i,2)-dRd(i,1)*dRd(i,2);
-%   B(4,3*(i-1)+2)= dRd(i,1)-dRd(i,1)*dRd(i,2);
-%   B(4,3*(i-1)+3)= -dRd(i,1)*dRd(i,2);
-%   
-%   B(5,3*(i-1)+1)= -dRd(i,2)*dRd(i,3);
-%   B(5,3*(i-1)+2)= dRd(i,3)-dRd(i,2)*dRd(i,3);
-%   B(5,3*(i-1)+3)= dRd(i,2)-dRd(i,2)*dRd(i,3);
-%   
-%   B(6,3*(i-1)+1)= dRd(i,3)-dRd(i,1)*dRd(i,3);
-%   B(6,3*(i-1)+2)= -dRd(i,1)*dRd(i,3);
-%   B(6,3*(i-1)+3)= dRd(i,1)-dRd(i,1)*dRd(i,3);
-% end

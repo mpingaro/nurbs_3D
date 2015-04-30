@@ -6,7 +6,7 @@ close all;
 clc
 
 deg = 2;      % Degree
-ref = 8;      % Rafinament
+ref =1;      % Rafinament
 t = 0.1;      % Altezza
 lambda = 0.5; % Moltiplicatore load
 
@@ -59,10 +59,10 @@ fl = load_area(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,f,dirf,proj);
 % ub=[0 1]; vb=0; wb=1;  dirf=3;  proj=0;
 % fl = load_line(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,f,dirf,proj);
 
-
 % compute displacement vector d and load vector including supports fs
-%[da,fs] = solve_nonlinear_ANS(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb,toll,nstep);
-[da,fs] = solve_nonlinear(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb,toll,nstep);
+%da = solve_nonlinear_ANS(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb,toll,nstep);
+%da = solve_nonlinear_ul(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb,toll,nstep);
+da = solve_nonlinear_tl(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb,toll,nstep);
 
 CPda = CPresult(CP,da);
 

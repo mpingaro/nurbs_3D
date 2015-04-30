@@ -1,4 +1,4 @@
-function ke = stiff_mat_el(i,p,u,U,j,q,v,V,k,r,w,W,CP,gwu,gwv,gww,D)
+function B = B_matrix_tl(i,p,u,U,j,q,v,V,k,r,w,W,CP,d)
 % Evaluates the stiffness matrix of an element for one integration point
 % Input: p,q,r:        polynomial degrees
 %        U,V,W:        knot vectors
@@ -7,6 +7,7 @@ function ke = stiff_mat_el(i,p,u,U,j,q,v,V,k,r,w,W,CP,gwu,gwv,gww,D)
 %        u,v,w:        NURBS coordinates of integration point
 %        D:            material matrix
 %        gwu,gwv,gww:  gaussian weights
+% J. Kiendl
 
 ne = (p+1)*(q+1)*(r+1);      % Control Points per element
 N = deriv(i,p,u,U);    % basisfunc in u
@@ -64,73 +65,85 @@ for c = 0:r
     end
   end
 end
-
 dxidx = inv(J);
 dRd = dRl*dxidx';
-dJ = det(J);
+
 
 % strain
-B = zeros(6,3*ne);
+BL = zeros(6,3*ne);
 for zz = 1:ne
   
-  B(1,3*(zz-1)+1)= dRd(zz,1);
-  B(1,3*(zz-1)+2)= 0.0;
-  B(1,3*(zz-1)+3)= 0.0;
+  BL(1,3*(zz-1)+1)= dRd(zz,1);
+  BL(1,3*(zz-1)+2)= 0.0;
+  BL(1,3*(zz-1)+3)= 0.0;
   
-  B(2,3*(zz-1)+1)= 0.0;
-  B(2,3*(zz-1)+2)= dRd(zz,2);
-  B(2,3*(zz-1)+3)= 0.0;
+  BL(2,3*(zz-1)+1)= 0.0;
+  BL(2,3*(zz-1)+2)= dRd(zz,2);
+  BL(2,3*(zz-1)+3)= 0.0;
   
-  B(3,3*(zz-1)+1)= 0.0;
-  B(3,3*(zz-1)+2)= 0.0;
-  B(3,3*(zz-1)+3)= dRd(zz,3);
+  BL(3,3*(zz-1)+1)= 0.0;
+  BL(3,3*(zz-1)+2)= 0.0;
+  BL(3,3*(zz-1)+3)= dRd(zz,3);
   
-  B(4,3*(zz-1)+1)= dRd(zz,2);
-  B(4,3*(zz-1)+2)= dRd(zz,1);
-  B(4,3*(zz-1)+3)= 0.0;
+  BL(4,3*(zz-1)+1)= dRd(zz,2);
+  BL(4,3*(zz-1)+2)= dRd(zz,1);
+  BL(4,3*(zz-1)+3)= 0.0;
   
-  B(5,3*(zz-1)+1)= 0.0;
-  B(5,3*(zz-1)+2)= dRd(zz,3);
-  B(5,3*(zz-1)+3)= dRd(zz,2);
+  BL(5,3*(zz-1)+1)= 0.0;
+  BL(5,3*(zz-1)+2)= dRd(zz,3);
+  BL(5,3*(zz-1)+3)= dRd(zz,2);
   
-  B(6,3*(zz-1)+1)= dRd(zz,3);
-  B(6,3*(zz-1)+2)= 0.0;
-  B(6,3*(zz-1)+3)= dRd(zz,1);
+  BL(6,3*(zz-1)+1)= dRd(zz,3);
+  BL(6,3*(zz-1)+2)= 0.0;
+  BL(6,3*(zz-1)+3)= dRd(zz,1);
 
 end
 
-map = (U(i+1)-U(i))*(V(j+1)-V(j))*(W(k+1)-W(k))/8;
-ke = B'*D*B*gwu*gwv*gww*dJ*map;
+L = zeros(3,3);
+for nl = 1:ne
+    L(1,1) = L(1,1) + dRd(nl,1)*d(3*(nl-1)+1);
+    L(1,2) = L(1,2) + dRd(nl,2)*d(3*(nl-1)+1);
+    L(1,3) = L(1,3) + dRd(nl,3)*d(3*(nl-1)+1);
+    
+    L(2,1) = L(2,1) + dRd(nl,1)*d(3*(nl-1)+2);
+    L(2,2) = L(2,2) + dRd(nl,2)*d(3*(nl-1)+2);
+    L(2,3) = L(2,3) + dRd(nl,3)*d(3*(nl-1)+2);
+
+    L(3,1) = L(3,1) + dRd(nl,1)*d(3*(nl-1)+3);
+    L(3,2) = L(3,2) + dRd(nl,2)*d(3*(nl-1)+3);
+    L(3,3) = L(3,3) + dRd(nl,3)*d(3*(nl-1)+3);
+end
+
+BLL = zeros(6,3*ne);
+for nl = 1:ne
+  
+  BLL(1,3*(nl-1)+1)= L(1,1)*dRd(nl,1);
+  BLL(1,3*(nl-1)+2)= L(2,1)*dRd(nl,1);
+  BLL(1,3*(nl-1)+3)= L(3,1)*dRd(nl,1);
+  
+  BLL(2,3*(nl-1)+1)= L(1,2)*dRd(nl,2);
+  BLL(2,3*(nl-1)+2)= L(2,2)*dRd(nl,2);
+  BLL(2,3*(nl-1)+3)= L(3,2)*dRd(nl,2);
+  
+  BLL(3,3*(nl-1)+1)= L(1,3)*dRd(nl,3);
+  BLL(3,3*(nl-1)+2)= L(2,3)*dRd(nl,3);
+  BLL(3,3*(zz-1)+3)= L(3,3)*dRd(nl,3);
+  
+  BLL(4,3*(nl-1)+1)= L(1,1)*dRd(nl,2)+L(1,2)*dRd(nl,1);
+  BLL(4,3*(nl-1)+2)= L(2,1)*dRd(nl,2)+L(2,2)*dRd(nl,1);
+  BLL(4,3*(nl-1)+3)= L(3,1)*dRd(nl,2)+L(3,2)*dRd(nl,1);
+  
+  BLL(5,3*(nl-1)+1)= L(1,2)*dRd(nl,3)+L(1,3)*dRd(nl,2);
+  BLL(5,3*(nl-1)+2)= L(2,2)*dRd(nl,3)+L(2,3)*dRd(nl,2);
+  BLL(5,3*(nl-1)+3)= L(3,2)*dRd(nl,3)+L(3,3)*dRd(nl,2);
+  
+  BLL(6,3*(nl-1)+1)= ;
+  BLL(6,3*(nl-1)+2)= ;
+  BLL(6,3*(nl-1)+3)= ;
+
+end
+
+B = BL+BLL;
 
 return
 
-
-% % OLD PART      
-% invJ = inv(J);
-% dJ = det(J);
-% 
-% % write dR in Matrix, separated Rdu, Rdv and Rdw
-% Rdu = zeros(3,3*ne);
-% Rdv = zeros(3,3*ne);
-% for l = 1:ne
-%   Rdu(1,3*l-2) = dRl(l,1);
-%   Rdu(2,3*l-1) = dRl(l,1);
-%   Rdu(3,3*l)   = dRl(l,1);
-%   Rdv(1,3*l-2) = dRl(l,2);
-%   Rdv(2,3*l-1) = dRl(l,2);
-%   Rdv(3,3*l)   = dRl(l,2);
-%   Rdw(1,3*l-2) = dRl(l,3);
-%   Rdw(2,3*l-1) = dRl(l,3);
-%   Rdw(3,3*l)   = dRl(l,3);
-% end
-% 
-% % differential operators Lu, Lv and Lw
-% Lu = [invJ(1,1) 0 0; 0 invJ(2,1) 0; 0 0 invJ(3,1); invJ(2,1) invJ(1,1) 0; 0 invJ(3,1) invJ(2,1); invJ(3,1) 0 invJ(1,1)];
-% Lv = [invJ(1,2) 0 0; 0 invJ(2,2) 0; 0 0 invJ(3,2); invJ(2,2) invJ(1,2) 0; 0 invJ(3,2) invJ(2,2); invJ(3,2) 0 invJ(1,2)];
-% Lw = [invJ(1,3) 0 0; 0 invJ(2,3) 0; 0 0 invJ(3,3); invJ(2,3) invJ(1,3) 0; 0 invJ(3,3) invJ(2,3); invJ(3,3) 0 invJ(1,3)];
-% 
-% % B Matrix
-% B = Lu*Rdu+Lv*Rdv+Lw*Rdw;
-% 
-% map = (U(i+1)-U(i))*(V(j+1)-V(j))*(W(k+1)-W(k))/8;
-% ke = B'*D*B*gwu*gwv*gww*dJ*map;

@@ -1,4 +1,4 @@
-function K = stiff_mat_grd_sig_grd(p,U,q,V,r,W,CP,sig,ngauss)
+function K = stiff_mat_grd_sig_grd_tl(p,U,q,V,r,W,CP,S,ngauss)
 
 % Read input
  % Control Points CP
@@ -58,11 +58,11 @@ for k = (r+1):(mw-r-1)
               gww = GWw(kw);
               J = detJ(i,p,u,U,j,q,v,V,k,r,w,W,CP);
               BNL = B_NL_matrix(i,p,u,U,j,q,v,V,k,r,w,W,CP);
-              sig_t = [sig(1,npt+1,nel+1), sig(4,npt+1,nel+1), sig(6,npt+1,nel+1);...
-                    sig(4,npt+1,nel+1), sig(2,npt+1,nel+1), sig(5,npt+1,nel+1);...
-                    sig(6,npt+1,nel+1), sig(5,npt+1,nel+1), sig(3,npt+1,nel+1)];
-              sig_t = blkdiag(sig_t,sig_t,sig_t);
-              ke = BNL'*sig_t*BNL*gwu*gwv*gww*J*map + ke;
+              S_t = [S(1,npt+1,nel+1), S(4,npt+1,nel+1), S(6,npt+1,nel+1);...
+                    S(4,npt+1,nel+1), S(2,npt+1,nel+1), S(5,npt+1,nel+1);...
+                    S(6,npt+1,nel+1), S(5,npt+1,nel+1), S(3,npt+1,nel+1)];
+              S_t = blkdiag(S_t,S_t,S_t);
+              ke = BNL'*S_t*BNL*gwu*gwv*gww*J*map + ke;
               npt = npt + 1;
         
               

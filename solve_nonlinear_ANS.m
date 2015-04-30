@@ -1,4 +1,4 @@
-function [d,fs] = solve_nonlinear_ANS(p,U,q,V,r,W,CP,E,nue,ngauss,f,rb,toll,nstep)
+function d = solve_nonlinear_ANS(p,U,q,V,r,W,CP,E,nue,ngauss,f,rb,toll,nstep)
 
 nu = length(CP(:,1,1,1));
 nv = length(CP(1,:,1,1));
@@ -57,8 +57,5 @@ for n = 1:nstep
     CP = CPd; % Aggiorno configurazione
     
 end
-
-% 5. calculate complete load vector
-fs=K*d;
 
 end

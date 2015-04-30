@@ -1,4 +1,10 @@
-function K = stiff_mat_grd_sig_grd(p,U,q,V,r,W,CP,sig,ngauss)
+function K = stiff_mat_tl(p,U,q,V,r,W,CP,d,E,nue,ngauss)
+% Returns global stiffness matrix for a plate in plane stress element
+% Input: p,q,r:    polynomial degrees
+%        U,V,W:    knot vectors
+%        CP:       control points
+%        E,nue:    material parameter
+%        ngauss:   vector with no. of gauss points for u, v and w
 
 % Read input
  % Control Points CP
@@ -12,6 +18,12 @@ check_input(p,mu,nu,q,mv,nv,r,mw,nw);
  % degrees of freedom ndof
 ndof = 3*nu*nv*nw;
 
+
+    % material matrix
+D = E/((1+nue)*(1-2*nue))*[1-nue nue nue 0 0 0; nue 1-nue nue 0 0 0;...
+    nue nue 1-nue 0 0 0; 0 0 0 (1-2*nue)/2 0 0;...
+    0 0 0 0 (1-2*nue)/2 0; 0 0 0 0 0 (1-2*nue)/2];
+ 
 % dof assigns three DoF (x,y,z) to every CP
 %  numbering follows CP: CP1->dof1,dof2,dof3 CP2->dof4,dof5,dof6
 dof = zeros(nu,nv,nw,3);
@@ -30,7 +42,6 @@ end
 % initialize global stiffness matrix
 K  = zeros(ndof,ndof);
 
-nel = 0;
 % loops over elements
 for k = (r+1):(mw-r-1)
   for j = (q+1):(mv-q-1)
@@ -38,14 +49,12 @@ for k = (r+1):(mw-r-1)
       % check if element is greater than zero
       if (U(i+1)~=U(i) && V(j+1)~=V(j) && W(k+1)~=W(k))
         ndof_e = 3*(p+1)*(q+1)*(r+1);
-        map = (U(i+1)-U(i))*(V(j+1)-V(j))*(W(k+1)-W(k))/8;
         ke = zeros(ndof_e,ndof_e);
 
         % Element stiffness matrix, loop over Gauss points
         [GPu,GWu] = gauss(ngauss(1));
         [GPv,GWv] = gauss(ngauss(2));
         [GPw,GWw] = gauss(ngauss(3));
-        npt = 0;
         for kw = 1:ngauss(3)
           for kv = 1:ngauss(2)
             for ku = 1:ngauss(1)
@@ -56,20 +65,11 @@ for k = (r+1):(mw-r-1)
               gwu = GWu(ku);
               gwv = GWv(kv);
               gww = GWw(kw);
-              J = detJ(i,p,u,U,j,q,v,V,k,r,w,W,CP);
-              BNL = B_NL_matrix(i,p,u,U,j,q,v,V,k,r,w,W,CP);
-              sig_t = [sig(1,npt+1,nel+1), sig(4,npt+1,nel+1), sig(6,npt+1,nel+1);...
-                    sig(4,npt+1,nel+1), sig(2,npt+1,nel+1), sig(5,npt+1,nel+1);...
-                    sig(6,npt+1,nel+1), sig(5,npt+1,nel+1), sig(3,npt+1,nel+1)];
-              sig_t = blkdiag(sig_t,sig_t,sig_t);
-              ke = BNL'*sig_t*BNL*gwu*gwv*gww*J*map + ke;
-              npt = npt + 1;
-        
-              
+              % linear part of stiffness matrix
+              ke = stiff_mat_el_tl(i,p,u,U,j,q,v,V,k,r,w,W,CP,d,gwu,gwv,gww,D) + ke;
             end
           end
         end
-        nel = nel + 1;
         
         % Insert ke into global stiffness matrix K
          % relation global-local dof
@@ -95,5 +95,3 @@ for k = (r+1):(mw-r-1)
     end
   end
 end
-
-return
