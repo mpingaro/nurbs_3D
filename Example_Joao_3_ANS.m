@@ -2,10 +2,11 @@
 % 3. circular beam with thickness change
 % with p=2 and ANS
 clear;
+clc;
 
 deg = 2;
 ref = 10;
-ts = [1 0.5 0.1 0.05 0.01 0.005 0.001];
+ts = [1 0.5 0.1 0.05 0.01 0.005]; % 0.001];
 
 for it = 1:length(ts)
   t=ts(it);
@@ -82,7 +83,7 @@ disp2x = Sd(1)-S(1);
 dispx=(disp1x+disp2x)/2;
 resa(it) = -dispx;
 
-[d,fs] = solve_ANS_xyz(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+[d,fs] = solve_ANS_standard(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
 CPd = CPresult(CP,d);
 S = get_point_solid(1,0,0,0,0,0,p,q,r,U,V,W,CP);
 Sd = get_point_solid(1,0,0,0,0,0,p,q,r,U,V,W,CPd);
@@ -102,7 +103,7 @@ semilogx(sl,resa,'-o');
 semilogx(sl,resaxyz,'-v');
 % ylim([0.6 1.1]);
 grid on;
-legend('p=2','p=2 ANS','p=2 ANS xyz');
+legend('p=2','p=2 ANS new','p=2 ANS standard');
 hold off;
 
 % name2 = strcat('_deg',int2str(deg),'ref',int2str(ref));

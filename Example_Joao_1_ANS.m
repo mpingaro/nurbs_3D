@@ -2,12 +2,11 @@
 % 1+2. cantilever beam with mesh refinement or thickness change
 % with p=2 and ANS
 clear;
+clc;
 
 deg = 2;
-%refs = [2 4 8 16];
-%ts = [5 1 0.5 0.1 0.05 0.02 0.01];
-refs = [8];
-ts = [5];
+refs = [2 4 8 16];
+ts = [5 1 0.5 0.1 0.05 0.02 0.01];
 
 for it = 1:length(ts)-2
   t=ts(it);
@@ -63,15 +62,19 @@ fl = load_area(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,f,dirf,proj);
 % compute displacement vector d and load vector including supports fs
 [dc,fs] = solve(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
 [da,fs] = solve_ANS(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+[daa,fs] = solve_ANS_standard(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
 CPdc = CPresult(CP,dc);
 CPda = CPresult(CP,da);
+CPdaa = CPresult(CP,daa);
 
 enc = 0.5*fl'*dc;
 ena = 0.5*fl'*da;
+enaa = 0.5*fl'*daa;
 
 % res(iref) = en;
 resc(it,:) = [t,enc/20];
 resa(it,:) = [t,ena/20];
+resaa(it,:) = [t,enaa/20];
 
 end
 end
@@ -80,9 +83,11 @@ sl=100./resc(:,1);
 semilogx(sl,resc(:,2),'-x'); 
 hold on;
 semilogx(sl,resa(:,2),'-o');
+hold on;
+semilogx(sl,resaa(:,2),'-v');
 ylim([0.6 1.1]);
 grid on;
-legend('p=2','p=2 ANS xyz');
+legend('p=2','p=2 ANS new', 'p=2 ANS standard');
 hold off;
 
 % name2 = strcat('_deg',int2str(deg),'ref',int2str(ref));
@@ -90,4 +95,4 @@ hold off;
 % save(name3,'en');
 
 % visualize
-plot2in1(p,q,r,U,V,W,CP,CPda,rb,fl)
+% plot2in1(p,q,r,U,V,W,CP,CPda,rb,fl)

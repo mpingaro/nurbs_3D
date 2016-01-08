@@ -1,12 +1,13 @@
 % Example from ANS solid-shell paper
 % 6. Pinched Cylinder
 clear;
+clc;
 
-% deg = 2;
-refs = [4 8 16];
+deg = 3;
+refs = [2, 4, 8, 16, 32];
 % res = zeros(4,5,2);
 
-for deg = 3:3
+%for deg = 3:3
 for iref = 1:length(refs)
   ref = refs(iref);
 
@@ -61,7 +62,10 @@ ub=0; vb=1; wb=[0 1];  dirf=1;  proj=0;
 fl = load_line(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,f,dirf,proj);
 
 % compute displacement vector d and load vector including supports fs
-d = solve_new(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+d = solve(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+%d = solve_ANS_standard(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+%d = solve_ANS(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+
 CPd = CPresult(CP,d);
 
 % d2=200*d;
@@ -79,7 +83,7 @@ res(deg-1,iref)=(disp1x+disp2x)/2;
 % res(1:nw,iref,deg-1)=CPd(1,1,1:nw,1)-CP(1,1,1:nw,1);
 
 end
-end
+%end
 
 
 % name2 = strcat('_deg',int2str(deg),'ref',int2str(ref));

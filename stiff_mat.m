@@ -1,4 +1,4 @@
-function K = stiff_mat(p,U,q,V,r,W,CP,CP0,E,nue,ngauss)
+function K = stiff_mat(p,U,q,V,r,W,CP,E,nue,ngauss)
 % Returns global stiffness matrix for a plate in plane stress element
 % Input: p,q,r:    polynomial degrees
 %        U,V,W:    knot vectors
@@ -17,7 +17,11 @@ nw = length(CP(1,1,:,1));
 check_input(p,mu,nu,q,mv,nv,r,mw,nw);
  % degrees of freedom ndof
 ndof = 3*nu*nv*nw;
- 
+
+ % material matrix D
+D = E/((1+nue)*(1-2*nue))*[1-nue nue nue 0 0 0; nue 1-nue nue 0 0 0; nue nue 1-nue 0 0 0;...
+    0 0 0 (1-2*nue)/2 0 0; 0 0 0 0 (1-2*nue)/2 0; 0 0 0 0 0 (1-2*nue)/2];
+
 % dof assigns three DoF (x,y,z) to every CP
 %  numbering follows CP: CP1->dof1,dof2,dof3 CP2->dof4,dof5,dof6
 dof = zeros(nu,nv,nw,3);
@@ -60,12 +64,12 @@ for k = (r+1):(mw-r-1)
               gwv = GWv(kv);
               gww = GWw(kw);
               
-              % material matrix D
-              F0 = jacobian(i,p,u,U,j,q,v,V,k,r,w,W,CP0);
-              Ft = jacobian(i,p,u,U,j,q,v,V,k,r,w,W,CP);
-              %F = Ft*inv(F0);
-              F =  Ft*(F0\blkdiag(1,1,1));
-              D = material_elastic_matrix(E, nue, F);
+%               % material matrix D
+%               F0 = jacobian(i,p,u,U,j,q,v,V,k,r,w,W,CP0);
+%               Ft = jacobian(i,p,u,U,j,q,v,V,k,r,w,W,CP);
+%               %F = Ft*inv(F0);
+%               F =  Ft*(F0\blkdiag(1,1,1));
+%               D = material_elastic_matrix(E, nue, F);
               
               ke = stiff_mat_el(i,p,u,U,j,q,v,V,k,r,w,W,CP,gwu,gwv,gww,D) + ke;
             end
