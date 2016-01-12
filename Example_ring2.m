@@ -1,5 +1,6 @@
 % Cylinder
 clear;
+clc;
 p=2;
 q=1;
 r=1;
@@ -93,7 +94,7 @@ CPd = CPresult(CP,d);
 % visualize
 % plot1in1(p,q,r,U,V,W,CPd,rb,fl);
 % plot2in1(p,q,r,U,V,W,CP,CPd,rb,fl);
-plot_displacement(p,q,r,U,V,W,CP,CPd,rb,fl,3); axis off;
-% plot_strain_stress(p,q,r,U,V,W,CP,CPd,E,nue,d,2,9);
+ plot_displacement(p,q,r,U,V,W,CP,CPd,rb,fl,3); axis off;
+%plot_strain_stress(p,q,r,U,V,W,CP,CPd,E,nue,d,2,9);
 % figure(2);
 % plot_strain_stress_1in1(p,q,r,U,V,W,CP,CPd,rb,fl,E,nue,d,2,7);

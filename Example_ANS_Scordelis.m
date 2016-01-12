@@ -3,11 +3,14 @@
 clear;
 
 deg = 2;
-degw = 1;
-iref = 3;
-refs = [2 4 8 16];
+degw = deg;
+%refs = [2, 4, 8, 16];
+refs = 8;
+for iref = 1:length(refs)
 ref = refs(iref);
-% ref =20;
+
+clear CP;
+
 % material
 E = 4.32e8;
 nue = 0.0;
@@ -70,22 +73,26 @@ fl = load_body(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,F,dirf);
 % fl2 = load_area([],ub,vb,1,p,q,r,U,V,W,CP,ngauss,-90,dirf,0);
 
 % compute displacement vector d and load vector including supports fs
-[dc,fs] = solve(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
-[da,fs] = solve_ANS(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
-[daxyz,fs] = solve_ANS_xyz(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
-CPdc = CPresult(CP,dc);
-CPda = CPresult(CP,da);
-CPdaxyz = CPresult(CP,daxyz);
+%d = solve(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+%d = solve_ANS_standard(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+d = solve_ANS(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+
+CPd = CPresult(CP,d);
+uhc = CPd(end,end,end,3)-CP(end,end,end,3);
+resi(iref)= -uhc;
 
 % visualize
 % plot2in1(p,q,r,U,V,W,CP,CPda,rb,fl);
 % plot1in1(p,q,r,U,V,W,CPdc,rb,fl);
 % plot1in1(p,q,r,U,V,W,CPda,rb,fl);
-% plot_strain_stress(p,q,r,U,V,W,CP,CPd,rb,fl,E,nue,d,2,2)
+% plot_strain_stress(p,q,r,U,V,W,CP,CPd,rb,fl,E,nue,d,2,10)
+plot_strain_stress_1in1(p,q,r,U,V,W,CP,CPd,rb,fl,E,nue,d,2,6)
 
-uref = 0.3024;
-uhc = CPdc(end,end,end,3)-CP(end,end,end,3);
-uha = CPda(end,end,end,3)-CP(end,end,end,3);
-uhaxyz = CPdaxyz(end,end,end,3)-CP(end,end,end,3);
-resi=[-uhc -uha -uhaxyz uref]
+% uref = 0.3024;
+% uhc = CPdc(end,end,end,3)-CP(end,end,end,3);
+% uha = CPda(end,end,end,3)-CP(end,end,end,3);
+% uhaxyz = CPdaxyz(end,end,end,3)-CP(end,end,end,3);
+% resi=[-uhc -uha -uhaxyz uref]
 % load 'res'; res(iref,:)=resi; save 'res' 'res';
+
+end

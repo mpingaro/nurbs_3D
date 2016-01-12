@@ -4,7 +4,9 @@ clear;
 clc;
 
 deg = 3;
-refs = [2, 4, 8, 16, 32];
+% refs = [2, 4, 8, 16, 32];
+refs = 16;
+
 % res = zeros(4,5,2);
 
 %for deg = 3:3
@@ -81,6 +83,9 @@ disp2x = Sd(1)-S(1);
 res(deg-1,iref)=(disp1x+disp2x)/2;
 
 % res(1:nw,iref,deg-1)=CPd(1,1,1:nw,1)-CP(1,1,1:nw,1);
+
+% visualize
+plot_strain_stress_1in1(p,q,r,U,V,W,CP,CPd,rb,fl,E,nue,d,2,6)
 
 end
 %end

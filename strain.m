@@ -1,4 +1,5 @@
 function epsilon = strain(p,q,r,i,j,k,u,v,w,U,V,W,CP,d)
+
 % Calculates B-Matrix as in stiff_mat_el. Then strain = B*d
 % Input: p,q,r:     polynomial degrees
 %        U,V,W:     knot vectors
@@ -87,6 +88,5 @@ Lw = [invJ(1,3) 0 0; 0 invJ(2,3) 0; 0 0 invJ(3,3); invJ(2,3) invJ(1,3) 0; 0 invJ
 
 % B Matrix
 B = Lu*Rdu+Lv*Rdv+Lw*Rdw;
-
 % strain
 epsilon = B*d;

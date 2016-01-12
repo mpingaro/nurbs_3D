@@ -16,8 +16,9 @@ mw = length(W);
 nu = length(CP2(:,1,1,1));
 nv = length(CP2(1,:,1,1));
 nw = length(CP2(1,1,:,1));
-D = E/((1+nue)*(1-2*nue))*[1-nue nue nue 0 0 0; nue 1-nue nue 0 0 0; nue nue 1-nue 0 0 0
-                           0 0 0 (1-2*nue)/2 0 0; 0 0 0 0 (1-2*nue)/2 0; 0 0 0 0 0 (1-2*nue)/2];
+
+D = E/((1+nue)*(1-2*nue)).*[1-nue nue nue 0 0 0; nue 1-nue nue 0 0 0; nue nue 1-nue 0 0 0;...
+    0 0 0 (1-2*nue)/2 0 0; 0 0 0 0 (1-2*nue)/2 0; 0 0 0 0 0 (1-2*nue)/2];
 %=================================================================
 % FIRST WINDOW: UNDEFORMED STRUCTURE
 % 1. original geometry, supports and load arrows

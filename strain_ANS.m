@@ -1,11 +1,10 @@
-function K = stiff_mat_ANS_standard(p,U,q,V,r,W,CP,E,nue,ngauss)
-% Returns global stiffness matrix for a plate in plane stress element
-% Input: p,q,r:    polynomial degrees
-%        U,V,W:    knot vectors
-%        CP:       control points
-%        E,nue:    material parameter
-%        ngauss:   vector with no. of gauss points for u, v and w
-% J. Kiendl
+function epsilon = strain_ANS(p,q,r,i,j,k,u,v,w,U,V,W,CP,d)
+% Calculates B-Matrix as in stiff_mat_el. Then strain = B*d
+% Input: p,q,r:     polynomial degrees
+%        U,V,W:     knot vectors
+%        CP:        control points
+%        u,v,w:     NURBS coordinates sampling point
+%        d:         element displacement vector
 
 % Read input
  % Control Points CP
@@ -19,9 +18,6 @@ check_input(p,mu,nu,q,mv,nv,r,mw,nw);
  % degrees of freedom ndof
 ndof = 3*nu*nv*nw;
 ndof_e = 3*(p+1)*(q+1)*(r+1);
- % material matrix D
-D = E/((1+nue)*(1-2*nue))*[1-nue nue nue 0 0 0; nue 1-nue nue 0 0 0; nue nue 1-nue 0 0 0
-                           0 0 0 (1-2*nue)/2 0 0; 0 0 0 0 (1-2*nue)/2 0; 0 0 0 0 0 (1-2*nue)/2];
 
 % dof assigns three DoF (x,y,z) to every CP
 %  numbering follows CP: CP1->dof1,dof2,dof3 CP2->dof4,dof5,dof6
@@ -37,9 +33,6 @@ for cpk = 1:nw
     end
   end
 end
-
-% initialize global stiffness matrix
-K  = zeros(ndof,ndof);
 
 % for ANS: extrapolation matrices
 % 1. for xixi and xizeta
@@ -169,47 +162,15 @@ for k = (r+1):(mw-r-1)
               iip = iip+1;
             end
           end
-          
-          % --------------------------------------
-          % Then: Loop over integration points: call B-matrix and perform
-          % numerical integration of ke
-          iip = 1;
-          for kv = 1:ngauss(2)
-            for ku = 1:ngauss(1)
-              % NURBS coordinates u,v from gauss coordinates
-              u = ( U(i+1)+U(i) + GPu(ku)*(U(i+1)-U(i)) )/2;
-              v = ( V(j+1)+V(j) + GPv(kv)*(V(j+1)-V(j)) )/2;
-              w = ( W(k+1)+W(k) + GPw(kw)*(W(k+1)-W(k)) )/2;
-              dJ = detJ(i,p,u,U,j,q,v,V,k,r,w,W,CP);
-              gwu = GWu(ku); gwv = GWv(kv); gww = GWw(kw);
-              ke = Ba(:,:,iip)'*D*Ba(:,:,iip)*gwu*gwv*gww*dJ*map + ke;
-              iip = iip+1;
-            end
-          end
-          
-        end
-        
-        % Insert ke into global stiffness matrix K
-         % relation global-local dof
-        dof_l = zeros(1,ndof_e);
-        l=1;
-        for cpk = k-r:k
-          for cpj = j-q:j
-            for cpi = i-p:i
-              dof_l(l)  =dof(cpi,cpj,cpk,1);
-              dof_l(l+1)=dof(cpi,cpj,cpk,2);
-              dof_l(l+2)=dof(cpi,cpj,cpk,3);
-              l=l+3;
-            end
-          end
-        end
-         % insert ke into K
-        for col = 1:3*(1+p)*(1+q)*(1+r)
-          for row = 1:3*(1+p)*(1+q)*(1+r)
-            K(dof_l(row),dof_l(col)) = ke(row,col) + K(dof_l(row),dof_l(col));
-          end
         end
       end
     end
   end
 end
+
+epsilon = zeros(6,1);
+  % strain
+  for i = 1:size(iip)
+      epsilon = epsilon + Ba(:,:,i)*d;
+  end
+  
