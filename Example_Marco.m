@@ -2,18 +2,16 @@
 % J. Kiendl
 clear;
 
-deg = 2;
-ref = 1;
-% L=10; t=1; w=1;
-L=1; t=1; w=1;
-
+deg = 1;
+ref = 64;
+slen = 100;
+L=100; t=L/slen; w=1;
 % material
-E = 1e10;
+E = 1e3;
 nue = 0.0;
 
 % Gauss Points
-ngauss=[3 3 3];
-
+ngauss=[2 2 2];
 
 p=1; q=1; r=1;
 U=[0 0 1 1]; V=[0 0 1 1]; W=[0 0 1 1];
@@ -40,7 +38,9 @@ us=[0 0]; vs=[0 1]; ws=[0 1];  dirs=3;
 rb = supports(rb,us,vs,ws,dirs,CP);
 
 % load vector
-F = E*w/4/L^3*t^3;  fl=[];
+F = 0.1*t^(1/2);
+%F = E*w/4/L^3*t^3;  
+fl=[];
 ub=1; vb=[0 1]; wb=[0 1];  dirf=3;
 fl = load_area(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,F,dirf,0);
 % fl2 = load_area(fl2,ub,vb,wb,p2,q2,r2,U2,V2,W2,CP2,ngauss,-fq,dirf,proj);
@@ -50,6 +50,9 @@ fl = load_area(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,F,dirf,0);
 % [da,fs] = solve_ANS(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
   CPdc = CPresult(CP,dc);
 %   CPda = CPresult(CP,da);
+
+en = 0.5*fs'*dc;
+disp(en);
 
 % visualize
   plot2in1(p,q,r,U,V,W,CP,CPdc,rb,fl);
