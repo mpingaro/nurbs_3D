@@ -68,7 +68,17 @@ d = solve_ANS_standard(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
 
 CPd = CPresult(CP,d);
 
-res(deg-1,iref)=(CPd(nu,nv,1,3)-CP(nu,nv,1,3)+CPd(nu,nv,nw,3)-CP(nu,nv,nw,3))/2;
+S = get_point_solid(1,1,1,0,0,0,p,q,r,U,V,W,CP);
+Sd = get_point_solid(1,1,1,0,0,0,p,q,r,U,V,W,CPd);
+disp1z = Sd(3)-S(3);
+
+S = get_point_solid(1,1,0,0,0,0,p,q,r,U,V,W,CP);
+Sd = get_point_solid(1,1,0,0,0,0,p,q,r,U,V,W,CPd);
+disp2z = Sd(3)-S(3);
+
+res(deg-1,iref)=(disp1z + disp2z)/2;
+
+%res(deg-1,iref)=(CPd(nu,nv,1,3)-CP(nu,nv,1,3)+CPd(nu,nv,nw,3)-CP(nu,nv,nw,3))/2;
 
 end
 
