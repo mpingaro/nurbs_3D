@@ -2,9 +2,10 @@
 % 3. circular beam with thickness change
 clear;
 
-deg = 3;
+deg = 2;
 ref = 10;
 ts = [1 0.5 0.1 0.05 0.01 0.005 0.001];
+%ts = 0.001;
 
 for it = 1:length(ts)
   t=ts(it);
@@ -59,7 +60,9 @@ fl = load_area(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,f,dirf,proj);
 % fl = load_line(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,f,dirf,proj);
 
 % compute displacement vector d and load vector including supports fs
-[d,fs] = solve(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+%[d,fs] = solve(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+[d,fs] = solve_ANS_standard(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+
 CPd = CPresult(CP,d);
 
 S = get_point_solid(1,0,0,0,0,0,p,q,r,U,V,W,CP);
@@ -73,8 +76,6 @@ dispx=(disp1x+disp2x)/2;
 res(it,:) = [t,dispx];
 
 end
-
-res
 
 % name2 = strcat('_deg',int2str(deg),'ref',int2str(ref));
 % name3 = strcat(fold,name,name2,'.mat');

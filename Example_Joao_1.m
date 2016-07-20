@@ -3,12 +3,14 @@
 clear;
 
 deg = 2;
-refs = [2 4 8 16];
+%refs = [2 4 8 16];
 ts = [5 1 0.5 0.1 0.05 0.02 0.01];
+refs = 8;
+%ts = 1;
 
 for it = 1:length(ts)
   t=ts(it);
-for iref=3:3%1:length(refs)
+for iref=1:length(refs)
   ref=refs(iref);
   
 p=1;
@@ -58,13 +60,16 @@ fl = load_area(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,f,dirf,proj);
 % fl = load_line(fl,ub,vb,wb,p,q,r,U,V,W,CP,ngauss,f,dirf,proj);
 
 % compute displacement vector d and load vector including supports fs
-[d,fs] = solve(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+%[d,fs] = solve(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+[d,fs] = solve_ANS_standard(p,U,q,V,r,W,CP,E,nue,ngauss,fl,rb);
+
+
 CPd = CPresult(CP,d);
 
 en = 0.5*fl'*d;
 
-% res(iref) = en;
-res(it,:) = [t,en];
+res(it) = en;
+%res(iref,:) = [ref,en];
 
 end
 end
